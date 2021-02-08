@@ -47,7 +47,7 @@ impl<T> CpixelConverter<T> {
 
 impl<T> Default for CpixelConverter<T> {
     fn default() -> Self {
-        CpixelConverter{ buf: vec![] }
+        CpixelConverter { buf: vec![] }
     }
 }
 
@@ -75,11 +75,14 @@ impl<T: Into<u8> + Default + Sum + Copy> CpixelConverter<T> {
         self.resize(new_dimensions.total());
 
         let row_groups = image.buffer
+            // Chunks of row_data.
             .chunks_exact(image.dimensions.width)
+            // Chunks of rows of cpixel data.
             .map(|x| x.chunks_exact(cpixel_dimensions.width))
+            // Chunks of cpixel rows.
             .chunks(cpixel_dimensions.height);
 
-        let mut buf_slice = &mut self.buf[..];
+        let mut buf_slice: &mut [T];
 
         for (i, row_group) in row_groups.into_iter().enumerate() {
             let index = i * new_dimensions.width;
@@ -93,6 +96,7 @@ impl<T: Into<u8> + Default + Sum + Copy> CpixelConverter<T> {
 
         let new_buf = self.buf.iter()
             .map(|x| {
+                debug_assert!(*x <= u8::MAX);
                 let brightness = (*x).into() / cpixel_dimensions.total() as u8;
                 Cpixel::from_brightness(brightness)
             });
@@ -112,11 +116,14 @@ mod tests {
         let mut converter = CpixelConverter::default();
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
         let image = BitmapImage::new(Dimensions { height: 2, width: 4 },
-                         vec![0, 0, 0, 0, 0, 0, 0, 0]);
+                                     vec![0, 0, 0, 0, 0, 0, 0, 0]);
         let cpixel_image = converter.convert(&image, &cpixel_dimensions);
         assert_eq!(
             cpixel_image,
-            BitmapImage{ buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }
+            BitmapImage { buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }
         );
     }
+
+    #[test]
+    fn test_convert_to_right_size() {}
 }
