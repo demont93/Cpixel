@@ -10,7 +10,7 @@ edition = "2018"
 crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
-cpixels = { git = "githttps://github.com/demont93/cpixels" , branch = "main"}
+cpixels = { git = "https://github.com/demont93/cpixels.git" , branch = "main"}
 
 [target.'cfg(target_os = "android")'.dependencies]
 jni = { version = "0.18.0", default-features = false }
