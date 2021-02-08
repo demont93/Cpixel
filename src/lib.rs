@@ -1,6 +1,3 @@
-// #![cfg(target_os = "android")]
-// #![allow(non_snake_case)]
-
 use crate::cpixel::{CpixelConverter, Cpixel};
 use crate::bitmap_image::{BitmapImage};
 use crate::dimensions::Dimensions;
@@ -133,3 +130,10 @@ mod tests {
         assert_eq!(cpixel_image.buffer, vec![Cpixel('N')]);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
