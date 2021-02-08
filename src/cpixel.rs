@@ -57,7 +57,7 @@ impl<T: Default> CpixelConverter<T> {
     }
 }
 
-impl<T: Into<u8> + Default + Sum + Copy> CpixelConverter<T> {
+impl<T: Into<u8> + Default + Sum + Copy + PartialOrd + From<u8>> CpixelConverter<T> {
     pub fn convert(
         &mut self,
         image: &BitmapImage<T>,
@@ -96,7 +96,7 @@ impl<T: Into<u8> + Default + Sum + Copy> CpixelConverter<T> {
 
         let new_buf = self.buf.iter()
             .map(|x| {
-                debug_assert!(*x <= u8::MAX);
+                debug_assert!(*x <= T::from(u8::MAX));
                 let brightness = (*x).into() / cpixel_dimensions.total() as u8;
                 Cpixel::from_brightness(brightness)
             });

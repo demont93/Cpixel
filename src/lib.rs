@@ -77,7 +77,7 @@ impl<PixelType> CpixelImageConverter<PixelType> {
     }
 }
 
-impl<T: Into<u8> + Default + Copy + Sum> CpixelImageConverter<T> {
+impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>> CpixelImageConverter<T> {
     pub fn convert(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
         self.converter.convert(&image, &self.cpixel_dimensions)
     }
