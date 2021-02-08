@@ -1,0 +1,7 @@
+[package]
+name = "cpixels"
+version = "0.1.0"
+authors = ["demont93 <demont93@gmail.com>"]
+edition = "2018"
+
+[dependencies]
