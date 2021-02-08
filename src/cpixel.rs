@@ -81,13 +81,14 @@ impl<T: Into<u8> + Default + Sum + Copy> CpixelConverter<T> {
 
         let mut buf_slice = &mut self.buf[..];
 
-        for row_group in &row_groups {
+        for (i, row_group) in row_groups.into_iter().enumerate() {
+            let index = i * new_dimensions.width;
+            buf_slice = &mut self.buf[index..];
             for row in row_group {
                 for (a, b) in buf_slice.iter_mut().zip(row) {
                     *a = b.iter().copied().sum();
                 }
             }
-            buf_slice = &mut buf_slice[new_dimensions.width..];
         }
 
         let new_buf = self.buf.iter()
