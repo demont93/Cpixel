@@ -1,12 +1,13 @@
-use crate::cpixel::{CpixelConverter, Cpixel};
-use crate::bitmap_image::{BitmapImage};
-use crate::dimensions::Dimensions;
+use cpixel::{CpixelConverter, Cpixel};
 use std::iter::Sum;
 
 mod yuv;
 mod bitmap_image;
 mod dimensions;
 mod cpixel;
+
+pub use dimensions::{Dimensions, Dim};
+pub use bitmap_image::{BitmapImage};
 
 pub struct CpixelImageConverter<T> {
     converter: CpixelConverter<T>,
@@ -96,7 +97,7 @@ mod tests {
         CpixelImageConverter::<u8>::new(
             &screen_dimensions,
             &input_image_dimensions,
-            &cpixel_dimensions
+            &cpixel_dimensions,
         );
     }
 
@@ -108,7 +109,7 @@ mod tests {
         let mut converter = CpixelImageConverter::<u8>::new(
             &screen_dimensions,
             &input_image_dimensions,
-            &cpixel_dimensions
+            &cpixel_dimensions,
         );
         let image = BitmapImage::new(input_image_dimensions, vec![0_u8]);
         let cpixel_image = converter.convert(&image);
@@ -120,21 +121,13 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let screen_dimensions = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        let mut converter : CpixelImageConverter<u8> = CpixelImageConverter::new(
+        let mut converter: CpixelImageConverter<u8> = CpixelImageConverter::new(
             &screen_dimensions,
             &input_image_dimensions,
-            &cpixel_dimensions
+            &cpixel_dimensions,
         );
         let image = BitmapImage::new(input_image_dimensions, vec![255_u8]);
         let cpixel_image = converter.convert(&image);
         assert_eq!(cpixel_image.buffer, vec![Cpixel('N')]);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }
