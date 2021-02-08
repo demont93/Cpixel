@@ -1,4 +1,4 @@
-use cpixel::{CpixelConverter, Cpixel};
+use cpixel::{CpixelConverter};
 use std::iter::Sum;
 
 mod yuv;
@@ -8,6 +8,7 @@ mod cpixel;
 
 pub use dimensions::{Dimensions, Dim};
 pub use bitmap_image::{BitmapImage};
+pub use cpixel::Cpixel;
 
 pub struct CpixelImageConverter<T> {
     converter: CpixelConverter<T>,
