@@ -77,8 +77,8 @@ impl<PixelType> CpixelImageConverter<PixelType> {
         cpixel_dimensions: &Dimensions,
     ) -> Dimensions {
         let dimensions_in_cpixels = Dimensions {
-            height: image_dimensions.height / cpixel_dimensions.height,
-            width: image_dimensions.width / cpixel_dimensions.width,
+            height: (image_dimensions.height as f64 / cpixel_dimensions.height as f64).ceil() as usize,
+            width: (image_dimensions.width as f64 / cpixel_dimensions.width as f64).ceil() as usize,
         };
         Dimensions::closest_best_size(&dimensions_in_cpixels, screen_dimensions)
     }
