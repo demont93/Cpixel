@@ -88,7 +88,7 @@ impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>>
 CpixelImageConverter<T> {
     pub fn convert(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
         self.converter.convert(
-            &image.resize(Dim::Width(self.output_dimensions.width)),
+            &image.resize_locked(Dim::Width(self.output_dimensions.width)),
             &self.cpixel_dimensions,
         )
     }
