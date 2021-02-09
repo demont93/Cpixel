@@ -7,7 +7,7 @@ pub struct Dimensions {
 }
 
 impl Dimensions {
-    pub fn closest_best_size(
+    pub fn fit_with_locked_ratio(
         image_dimensions: &Dimensions,
         screen_dimensions: &Dimensions,
     ) -> Self {
@@ -107,7 +107,7 @@ mod tests {
     fn test_closest_best_size_same_size() {
         let screen_dimensions = Dimensions { height: 300, width: 1 };
         let image_dimensions = Dimensions { height: 300, width: 1 };
-        let final_dim = Dimensions::closest_best_size(&image_dimensions, &screen_dimensions);
+        let final_dim = Dimensions::fit_with_locked_ratio(&image_dimensions, &screen_dimensions);
         assert_eq!(final_dim, image_dimensions);
     }
 
@@ -116,8 +116,8 @@ mod tests {
         let screen_dimensions = Dimensions { height: 600, width: 2 };
         let image_dimensions = Dimensions { height: 300, width: 1 };
         assert_eq!(screen_dimensions.ratio(), image_dimensions.ratio());
-        let final_dim = Dimensions::closest_best_size(&image_dimensions,
-                                                      &screen_dimensions);
+        let final_dim = Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                                          &screen_dimensions);
         assert_eq!(final_dim, screen_dimensions);
     }
 
@@ -125,8 +125,8 @@ mod tests {
     fn test_fit_width() {
         let screen_dimensions = Dimensions { height: 100, width: 100 };
         let image_dimensions = Dimensions { height: 100, width: 200 };
-        let final_dim = Dimensions::closest_best_size(&image_dimensions,
-                                                      &screen_dimensions);
+        let final_dim = Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                                          &screen_dimensions);
         assert_eq!(final_dim, Dimensions { height: 50, width: 100 });
     }
 
@@ -134,8 +134,8 @@ mod tests {
     fn test_fit_height() {
         let screen_dimensions = Dimensions { height: 100, width: 100 };
         let image_dimensions = Dimensions { height: 200, width: 100 };
-        let final_dim = Dimensions::closest_best_size(&image_dimensions,
-                                                      &screen_dimensions);
+        let final_dim = Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                                          &screen_dimensions);
         assert_eq!(final_dim, Dimensions { height: 100, width: 50 });
     }
 
@@ -143,8 +143,8 @@ mod tests {
     fn test_minimum_height_1() {
         let screen_dimensions = Dimensions { height: 100, width: 100 };
         let image_dimensions = Dimensions { height: 1, width: 200 };
-        let final_dim = Dimensions::closest_best_size(&image_dimensions,
-                                                      &screen_dimensions);
+        let final_dim = Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                                          &screen_dimensions);
         assert_eq!(final_dim, Dimensions { height: 1, width: 100 });
     }
 
@@ -152,8 +152,8 @@ mod tests {
     fn test_minimum_width_1() {
         let screen_dimensions = Dimensions { height: 100, width: 100 };
         let image_dimensions = Dimensions { height: 200, width: 1 };
-        let final_dim = Dimensions::closest_best_size(&image_dimensions,
-                                                      &screen_dimensions);
+        let final_dim = Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                                          &screen_dimensions);
         assert_eq!(final_dim, Dimensions { height: 100, width: 1 });
     }
 
@@ -162,8 +162,8 @@ mod tests {
     fn test_cant_pass_image_with_zero() {
         let screen_dimensions = Dimensions { height: 10, width: 100 };
         let image_dimensions = Dimensions { height: 0, width: 1 };
-        Dimensions::closest_best_size(&image_dimensions,
-                                      &screen_dimensions);
+        Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                          &screen_dimensions);
     }
 
     #[test]
@@ -171,7 +171,7 @@ mod tests {
     fn test_cant_pass_screen_with_zero() {
         let screen_dimensions = Dimensions { height: 10, width: 00 };
         let image_dimensions = Dimensions { height: 50, width: 1 };
-        Dimensions::closest_best_size(&image_dimensions,
-                                      &screen_dimensions);
+        Dimensions::fit_with_locked_ratio(&image_dimensions,
+                                          &screen_dimensions);
     }
 }

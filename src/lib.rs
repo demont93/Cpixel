@@ -76,11 +76,11 @@ impl<PixelType> CpixelImageConverter<PixelType> {
         screen_dimensions: &Dimensions,
         cpixel_dimensions: &Dimensions,
     ) -> Dimensions {
-        let dimensions_in_cpixels = Dimensions {
-            height: (image_dimensions.height as f64 / cpixel_dimensions.height as f64).ceil() as usize,
-            width: (image_dimensions.width as f64 / cpixel_dimensions.width as f64).ceil() as usize,
+        let screen_in_pixels = Dimensions {
+            height: screen_dimensions.height * cpixel_dimensions.height,
+            width: screen_dimensions.width * cpixel_dimensions.width,
         };
-        Dimensions::closest_best_size(&dimensions_in_cpixels, screen_dimensions)
+        Dimensions::fit_with_locked_ratio(image_dimensions, &screen_in_pixels)
     }
 }
 
