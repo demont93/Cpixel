@@ -31,7 +31,8 @@ impl Cpixel {
 
 impl Display for Cpixel {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+        let Cpixel(c) = self;
+        write!(f, "{}", *c)
     }
 }
 
