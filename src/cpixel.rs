@@ -2,6 +2,8 @@ use crate::bitmap_image::BitmapImage;
 use crate::dimensions::Dimensions;
 use itertools::Itertools;
 use std::iter::Sum;
+use std::fmt::{Display, Formatter};
+use std::fmt;
 
 #[derive(Eq, PartialEq, Debug, Copy, Clone)]
 pub struct Cpixel(pub char);
@@ -24,6 +26,12 @@ impl Cpixel {
         ];
         let index = BRIGHTNESS.iter().rposition(|x| *x <= brightness).unwrap();
         return Cpixel(CHARS[index]);
+    }
+}
+
+impl Display for Cpixel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
