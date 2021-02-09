@@ -32,6 +32,7 @@ impl<PixelType> CpixelImageConverter<PixelType> {
             output_dimensions: Self::generate_output_dimensions(
                 input_image_dimensions,
                 screen_dimensions,
+                cpixel_dimensions
             ),
         }
     }
