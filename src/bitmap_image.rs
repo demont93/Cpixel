@@ -18,21 +18,25 @@ impl<T> BitmapImage<T> {
 }
 
 impl<T: Clone + Default> BitmapImage<T> {
-    pub fn resize(&self, size: Dim) -> BitmapImage<T> {
-        let new_dimensions = self.dimensions.locked_ratio_resize(&size);
-        let new_buf: Vec<T> = vec![Default::default(); new_dimensions.total()];
-        match new_dimensions.partial_cmp(&self.dimensions) {
+    pub fn resize(&self, dimensions: &Dimensions) -> BitmapImage<T> {
+        let new_buf: Vec<T> = vec![Default::default(); dimensions.total()];
+        match dimensions.partial_cmp(&self.dimensions) {
             None => panic!("Shouldn't reach here."),
             Some(Ordering::Equal) => {
                 self.clone()
             }
             Some(Ordering::Less) => {
-                self.shrink(new_dimensions, new_buf)
+                self.shrink(*dimensions, new_buf)
             }
             Some(Ordering::Greater) => {
-                self.grow(new_dimensions, new_buf)
+                self.grow(*dimensions, new_buf)
             }
         }
+    }
+
+    pub fn resize_locked(&self, size: Dim) -> BitmapImage<T> {
+        let new_dimensions = self.dimensions.locked_ratio_resize(&size);
+        self.resize(&new_dimensions)
     }
 
     fn shrink(&self, new_dimensions: Dimensions, mut new_buffer: Vec<T>) -> Self {
@@ -162,7 +166,7 @@ mod tests {
         let buf = vec![10; 10];
         let dimensions = Dimensions { height: 1, width: 10 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(15));
+        let image = image.resize_locked(Dim::Width(15));
         assert_eq!(image.buffer, vec![10; 15]);
         assert_eq!(image.dimensions, Dimensions { height: 1, width: 15 });
     }
@@ -172,7 +176,7 @@ mod tests {
         let buf = vec![10; 40];
         let dimensions = Dimensions { height: 4, width: 10 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(15));
+        let image = image.resize_locked(Dim::Width(15));
         assert_eq!(image.buffer, vec![10; 90]);
         assert_eq!(image.dimensions, Dimensions { height: 6, width: 15 });
     }
@@ -182,7 +186,7 @@ mod tests {
         let buf = (1..=10).collect::<Vec<usize>>();
         let dimensions = Dimensions { height: 1, width: 10 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(15));
+        let image = image.resize_locked(Dim::Width(15));
         assert_eq!(image.buffer, vec![
             1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10
         ]);
@@ -194,7 +198,7 @@ mod tests {
         let buf = (1..=30).collect::<Vec<usize>>();
         let dimensions = Dimensions { height: 3, width: 10 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(15));
+        let image = image.resize_locked(Dim::Width(15));
         assert_eq!(image.buffer, vec![
             1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10,
             1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10,
@@ -209,7 +213,7 @@ mod tests {
         let buf = vec![10, 11];
         let dimensions = Dimensions { height: 1, width: 2 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(7));
+        let image = image.resize_locked(Dim::Width(7));
         assert_eq!(image.buffer, vec![
             10, 10, 10, 10, 11, 11, 11, 10, 10, 10, 10, 11, 11, 11, 10, 10, 10,
             10, 11, 11, 11
@@ -222,7 +226,7 @@ mod tests {
         let buf = vec![1; 10];
         let dimensions = Dimensions { height: 1, width: 10 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(5));
+        let image = image.resize_locked(Dim::Width(5));
         assert_eq!(image.buffer, vec![1; 5]);
         assert_eq!(image.dimensions, Dimensions { height: 1, width: 5 });
     }
@@ -232,7 +236,7 @@ mod tests {
         let buf = (1..=40).collect();
         let dimensions = Dimensions { height: 4, width: 10 };
         let image = BitmapImage::new(dimensions, buf);
-        let image = image.resize(Dim::Width(3));
+        let image = image.resize_locked(Dim::Width(3));
         assert_eq!(image.buffer, vec![34, 37, 40]);
         assert_eq!(image.dimensions, Dimensions { height: 1, width: 3 });
     }
