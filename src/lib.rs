@@ -65,6 +65,7 @@ impl<PixelType> CpixelImageConverter<PixelType> {
             output_dimensions: Self::generate_output_dimensions(
                 input_image_dimensions,
                 screen_dimensions,
+                cpixel_dimensions,
             ),
         }
     }
@@ -72,8 +73,13 @@ impl<PixelType> CpixelImageConverter<PixelType> {
     fn generate_output_dimensions(
         image_dimensions: &Dimensions,
         screen_dimensions: &Dimensions,
+        cpixel_dimensions: &Dimensions,
     ) -> Dimensions {
-        Dimensions::closest_best_size(image_dimensions, screen_dimensions)
+        let dimensions_in_cpixels = Dimensions {
+            height: image_dimensions.height / cpixel_dimensions.height,
+            width: image_dimensions.width / cpixel_dimensions.width,
+        };
+        Dimensions::closest_best_size(&dimensions_in_cpixels, screen_dimensions)
     }
 }
 
@@ -82,7 +88,7 @@ CpixelImageConverter<T> {
     pub fn convert(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
         self.converter.convert(
             &image.resize(Dim::Width(self.output_dimensions.width)),
-            &self.cpixel_dimensions
+            &self.cpixel_dimensions,
         )
     }
 }
