@@ -22,13 +22,13 @@ impl Dimensions {
             Some(Ordering::Greater) => {
                 Dimensions {
                     height: screen_dimensions.height,
-                    width: (screen_dimensions.height as f64 / image_ratio).round() as usize,
+                    width: (screen_dimensions.height as f64 / image_ratio) as usize,
                 }
             }
             // Fit image width.
             Some(Ordering::Less) => {
                 Dimensions {
-                    height: (screen_dimensions.width as f64 * image_ratio).round() as usize,
+                    height: (screen_dimensions.width as f64 * image_ratio) as usize,
                     width: screen_dimensions.width,
                 }
             }
