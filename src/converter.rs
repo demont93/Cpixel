@@ -3,12 +3,33 @@ use std::iter::Sum;
 use crate::{BitmapImage, Cpixel, Dimensions};
 use crate::cpixel::CpixelConverter;
 
+trait Brightness {
+    fn min() -> Self;
+    fn max() -> Self;
+    fn average(&self, rhs: &Self) -> Self;
+}
+
+impl Brightness for u8 {
+    fn min() -> Self {
+        u8::MIN
+    }
+
+    fn max() -> Self {
+        u8::MAX
+    }
+
+    fn average(&self, rhs: &Self) -> Self {
+        (self as u16 + rhs as u16 / 2) as u8
+    }
+}
+
 pub struct Converter<T> {
     converter: CpixelConverter<T>,
     cpixel_dimensions: Dimensions,
     output_constraints: Dimensions,
     input_image_dimensions: Dimensions,
     output_dimensions: Dimensions,
+    maximize_contrast: bool
 }
 
 impl<PixelType> Converter<PixelType> {
@@ -16,6 +37,7 @@ impl<PixelType> Converter<PixelType> {
         output_constraints: &Dimensions,
         input_image_dimensions: &Dimensions,
         cpixel_dimensions: &Dimensions,
+        maximize_contrast: bool
     ) -> Self {
         Self {
             converter: Default::default(),
@@ -27,8 +49,13 @@ impl<PixelType> Converter<PixelType> {
                 output_constraints,
                 cpixel_dimensions
             ),
+            maximize_contrast
         }
     }
+    pub fn maximizing_contrast_on(&self) -> bool {
+        self.maximize_contrast
+    }
+
     pub fn constraints(&self) -> &Dimensions {
         &self.output_constraints
     }
@@ -61,6 +88,7 @@ impl<PixelType> Converter<PixelType> {
                 output_constraints,
                 cpixel_dimensions,
             ),
+            maximize_contrast: self.maximize_contrast
         }
     }
 
@@ -103,6 +131,7 @@ mod tests {
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
+            false,
         );
     }
 
@@ -115,6 +144,7 @@ mod tests {
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
+            false,
         );
         let image = BitmapImage::new(input_image_dimensions, vec![0_u8]);
         let cpixel_image = converter.convert_one(&image);
@@ -130,6 +160,7 @@ mod tests {
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
+            false,
         );
         let image = BitmapImage::new(input_image_dimensions, vec![255_u8]);
         let cpixel_image = converter.convert_one(&image);
