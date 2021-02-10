@@ -80,7 +80,7 @@ impl<PixelType> Converter<PixelType> {
 impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>>
 Converter<T> {
     pub fn convert_one(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
-        self.converter.convert(
+        self.converter.convert_one(
             &image.resize(&self.output_dimensions),
             &self.cpixel_dimensions,
         )

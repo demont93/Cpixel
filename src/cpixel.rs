@@ -67,7 +67,7 @@ impl<T: Default> CpixelConverter<T> {
 }
 
 impl<T: Into<u8> + Default + Sum + Copy + PartialOrd + From<u8>> CpixelConverter<T> {
-    pub fn convert(
+    pub fn convert_one(
         &mut self,
         image: &BitmapImage<T>,
         cpixel_dimensions: &Dimensions,
@@ -126,7 +126,7 @@ mod tests {
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
         let image = BitmapImage::new(Dimensions { height: 2, width: 4 },
                                      vec![0, 0, 0, 0, 0, 0, 0, 0]);
-        let cpixel_image = converter.convert(&image, &cpixel_dimensions);
+        let cpixel_image = converter.convert_one(&image, &cpixel_dimensions);
         assert_eq!(
             cpixel_image,
             BitmapImage { buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }
