@@ -161,7 +161,4 @@ mod tests {
             ImageBuffer { buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }
         );
     }
-
-    #[test]
-    fn test_convert_to_right_size() {}
 }
