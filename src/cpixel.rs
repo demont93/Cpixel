@@ -72,6 +72,7 @@ impl CpixelConverter {
         );
         // Resize the converter buffer, filling with default as necessary.
         self.resize_buf(new_dimensions.total());
+        self.reset_buf();
 
         let pixel_groups = self.partition_cpixels(image, cpixel_dimensions);
         self.store_cpixel_brightness_sum(pixel_groups, &new_dimensions);
@@ -99,7 +100,7 @@ impl CpixelConverter {
             let buf_slice = &mut self.buf[index..];
             for row in row_group {
                 for (a, b) in buf_slice.iter_mut().zip(row) {
-                    *a = b.iter().map(|x| *x as usize).sum();
+                    *a += b.iter().map(|x| *x as usize).sum::<usize>();
                 }
             }
         }
@@ -129,6 +130,10 @@ impl CpixelConverter {
             .map(move |x| x.chunks_exact(width))
             // Chunks of cpixel rows.
             .chunks(height)
+    }
+
+    fn reset_buf(&mut self) {
+        self.buf.fill(0)
     }
 }
 
