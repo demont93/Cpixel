@@ -1,4 +1,4 @@
-use crate::bitmap_image::BitmapImage;
+use crate::image_buffer::ImageBuffer;
 use crate::dimensions::Dimensions;
 use itertools::Itertools;
 use std::iter::Sum;
@@ -69,9 +69,9 @@ impl<T: Default> CpixelConverter<T> {
 impl<T: Into<u8> + Default + Sum + Copy + PartialOrd + From<u8>> CpixelConverter<T> {
     pub fn convert_one(
         &mut self,
-        image: &BitmapImage<T>,
+        image: &ImageBuffer<T>,
         cpixel_dimensions: &Dimensions,
-    ) -> BitmapImage<Cpixel> {
+    ) -> ImageBuffer<Cpixel> {
         assert_eq!(image.dimensions.width % cpixel_dimensions.width, 0);
         assert_eq!(image.dimensions.height % cpixel_dimensions.height, 0);
 
@@ -110,26 +110,26 @@ impl<T: Into<u8> + Default + Sum + Copy + PartialOrd + From<u8>> CpixelConverter
                 Cpixel::from_brightness(brightness)
             });
 
-        BitmapImage::new(new_dimensions, new_buf.collect())
+        ImageBuffer::new(new_dimensions, new_buf.collect())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bitmap_image::BitmapImage;
+    use crate::image_buffer::ImageBuffer;
     use crate::dimensions::Dimensions;
 
     #[test]
     fn test_convert_dimension_id_property() {
         let mut converter = CpixelConverter::default();
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        let image = BitmapImage::new(Dimensions { height: 2, width: 4 },
+        let image = ImageBuffer::new(Dimensions { height: 2, width: 4 },
                                      vec![0, 0, 0, 0, 0, 0, 0, 0]);
         let cpixel_image = converter.convert_one(&image, &cpixel_dimensions);
         assert_eq!(
             cpixel_image,
-            BitmapImage { buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }
+            ImageBuffer { buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }
         );
     }
 

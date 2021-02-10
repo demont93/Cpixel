@@ -1,27 +1,7 @@
 use std::iter::Sum;
 
-use crate::{BitmapImage, Cpixel, Dimensions};
+use crate::{ImageBuffer, Cpixel, Dimensions};
 use crate::cpixel::CpixelConverter;
-
-trait Brightness {
-    fn min() -> Self;
-    fn max() -> Self;
-    fn average(&self, rhs: &Self) -> Self;
-}
-
-impl Brightness for u8 {
-    fn min() -> Self {
-        u8::MIN
-    }
-
-    fn max() -> Self {
-        u8::MAX
-    }
-
-    fn average(&self, rhs: &Self) -> Self {
-        (self as u16 + rhs as u16 / 2) as u8
-    }
-}
 
 pub struct Converter<T> {
     converter: CpixelConverter<T>,
@@ -107,7 +87,7 @@ impl<PixelType> Converter<PixelType> {
 
 impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>>
 Converter<T> {
-    pub fn convert_one(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
+    pub fn convert_one(&mut self, image: &ImageBuffer<T>) -> ImageBuffer<Cpixel> {
         self.converter.convert_one(
             &image.resize(&self.output_dimensions),
             &self.cpixel_dimensions,
@@ -117,7 +97,7 @@ Converter<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::bitmap_image::BitmapImage;
+    use crate::image_buffer::ImageBuffer;
     use crate::converter::Converter;
     use crate::cpixel::Cpixel;
     use crate::dimensions::Dimensions;
@@ -146,7 +126,7 @@ mod tests {
             &cpixel_dimensions,
             false,
         );
-        let image = BitmapImage::new(input_image_dimensions, vec![0_u8]);
+        let image = ImageBuffer::new(input_image_dimensions, vec![0_u8]);
         let cpixel_image = converter.convert_one(&image);
         assert_eq!(cpixel_image.buffer, vec![Cpixel(' ')]);
     }
@@ -162,7 +142,7 @@ mod tests {
             &cpixel_dimensions,
             false,
         );
-        let image = BitmapImage::new(input_image_dimensions, vec![255_u8]);
+        let image = ImageBuffer::new(input_image_dimensions, vec![255_u8]);
         let cpixel_image = converter.convert_one(&image);
         assert_eq!(cpixel_image.buffer, vec![Cpixel('N')]);
     }
