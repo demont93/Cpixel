@@ -79,7 +79,7 @@ impl<PixelType> Converter<PixelType> {
 
 impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>>
 Converter<T> {
-    pub fn convert(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
+    pub fn convert_one(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
         self.converter.convert(
             &image.resize(&self.output_dimensions),
             &self.cpixel_dimensions,
@@ -117,7 +117,7 @@ mod tests {
             &cpixel_dimensions,
         );
         let image = BitmapImage::new(input_image_dimensions, vec![0_u8]);
-        let cpixel_image = converter.convert(&image);
+        let cpixel_image = converter.convert_one(&image);
         assert_eq!(cpixel_image.buffer, vec![Cpixel(' ')]);
     }
 
@@ -132,7 +132,7 @@ mod tests {
             &cpixel_dimensions,
         );
         let image = BitmapImage::new(input_image_dimensions, vec![255_u8]);
-        let cpixel_image = converter.convert(&image);
+        let cpixel_image = converter.convert_one(&image);
         assert_eq!(cpixel_image.buffer, vec![Cpixel('N')]);
     }
 }
