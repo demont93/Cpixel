@@ -3,7 +3,7 @@ use std::iter::Sum;
 use crate::{BitmapImage, Cpixel, Dimensions};
 use crate::cpixel::CpixelConverter;
 
-pub struct CpixelImageConverter<T> {
+pub struct Converter<T> {
     converter: CpixelConverter<T>,
     cpixel_dimensions: Dimensions,
     output_constraints: Dimensions,
@@ -11,7 +11,7 @@ pub struct CpixelImageConverter<T> {
     output_dimensions: Dimensions,
 }
 
-impl<PixelType> CpixelImageConverter<PixelType> {
+impl<PixelType> Converter<PixelType> {
     pub fn new(
         output_constraints: &Dimensions,
         input_image_dimensions: &Dimensions,
@@ -51,7 +51,7 @@ impl<PixelType> CpixelImageConverter<PixelType> {
         input_image_dimensions: &Dimensions,
         cpixel_dimensions: &Dimensions,
     ) -> Self {
-        CpixelImageConverter {
+        Converter {
             converter: self.converter,
             output_constraints: *output_constraints,
             input_image_dimensions: *input_image_dimensions,
@@ -78,7 +78,7 @@ impl<PixelType> CpixelImageConverter<PixelType> {
 }
 
 impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>>
-CpixelImageConverter<T> {
+Converter<T> {
     pub fn convert(&mut self, image: &BitmapImage<T>) -> BitmapImage<Cpixel> {
         self.converter.convert(
             &image.resize(&self.output_dimensions),
@@ -90,7 +90,7 @@ CpixelImageConverter<T> {
 #[cfg(test)]
 mod tests {
     use crate::bitmap_image::BitmapImage;
-    use crate::converter::CpixelImageConverter;
+    use crate::converter::Converter;
     use crate::cpixel::Cpixel;
     use crate::dimensions::Dimensions;
 
@@ -99,7 +99,7 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let output_constraints = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        CpixelImageConverter::<u8>::new(
+        Converter::<u8>::new(
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
@@ -111,7 +111,7 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let output_constraints = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        let mut converter = CpixelImageConverter::<u8>::new(
+        let mut converter = Converter::<u8>::new(
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
@@ -126,7 +126,7 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let output_constraints = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        let mut converter: CpixelImageConverter<u8> = CpixelImageConverter::new(
+        let mut converter: Converter<u8> = Converter::new(
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
