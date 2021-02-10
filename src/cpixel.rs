@@ -37,7 +37,7 @@ impl Display for Cpixel {
 }
 
 pub struct CpixelConverter {
-    buf: Vec<u8>,
+    buf: Vec<usize>,
 }
 
 impl CpixelConverter {
@@ -56,7 +56,7 @@ impl CpixelConverter {
 
 impl CpixelConverter {
     pub fn resize_buf(&mut self, new_len: usize) {
-        self.buf.resize_with(new_len, u8::default);
+        self.buf.resize_with(new_len, usize::default);
     }
 
     pub fn convert(
@@ -99,7 +99,7 @@ impl CpixelConverter {
             let buf_slice = &mut self.buf[index..];
             for row in row_group {
                 for (a, b) in buf_slice.iter_mut().zip(row) {
-                    *a = b.iter().copied().sum();
+                    *a = b.iter().map(|x| *x as usize).sum();
                 }
             }
         }
@@ -109,7 +109,7 @@ impl CpixelConverter {
         let pixels_in_cpixel = cpixel_dimensions.total();
         self.buf.iter()
             .map(|x| {
-                let average = *x / pixels_in_cpixel as u8;
+                let average = (*x / pixels_in_cpixel) as u8;
                 Cpixel::from_brightness(average)
             })
             .collect()
