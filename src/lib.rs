@@ -1,7 +1,4 @@
-use std::iter::Sum;
-
 pub use image_buffer::ImageBuffer;
-use cpixel::CpixelConverter;
 pub use cpixel::Cpixel;
 pub use dimensions::{Dim, Dimensions};
 

@@ -1,23 +1,24 @@
-use std::iter::Sum;
-
 use crate::{ImageBuffer, Cpixel, Dimensions};
 use crate::cpixel::CpixelConverter;
+use crate::pixel::{ToBrightness};
+use itertools::{MinMaxResult, Itertools};
 
-pub struct Converter<T> {
-    converter: CpixelConverter<T>,
+pub struct Converter {
+    converter: CpixelConverter,
     cpixel_dimensions: Dimensions,
     output_constraints: Dimensions,
     input_image_dimensions: Dimensions,
     output_dimensions: Dimensions,
-    maximize_contrast: bool
+    maximize_contrast: bool,
 }
 
-impl<PixelType> Converter<PixelType> {
+impl Converter {
+    #[allow(dead_code)]
     pub fn new(
         output_constraints: &Dimensions,
         input_image_dimensions: &Dimensions,
         cpixel_dimensions: &Dimensions,
-        maximize_contrast: bool
+        maximize_contrast: bool,
     ) -> Self {
         Self {
             converter: Default::default(),
@@ -27,31 +28,38 @@ impl<PixelType> Converter<PixelType> {
             output_dimensions: Self::generate_output_dimensions(
                 input_image_dimensions,
                 output_constraints,
-                cpixel_dimensions
+                cpixel_dimensions,
             ),
-            maximize_contrast
+            maximize_contrast,
         }
     }
+
+    #[allow(dead_code)]
     pub fn maximizing_contrast_on(&self) -> bool {
         self.maximize_contrast
     }
 
+    #[allow(dead_code)]
     pub fn constraints(&self) -> &Dimensions {
         &self.output_constraints
     }
 
+    #[allow(dead_code)]
     pub fn image_settings(&self) -> &Dimensions {
         &self.input_image_dimensions
     }
 
+    #[allow(dead_code)]
     pub fn cpixel_dimensions_settings(&self) -> &Dimensions {
         &self.cpixel_dimensions
     }
 
+    #[allow(dead_code)]
     pub fn output_dimensions(&self) -> &Dimensions {
         &self.output_dimensions
     }
 
+    #[allow(dead_code)]
     pub fn with_settings(
         self,
         output_constraints: &Dimensions,
@@ -68,7 +76,7 @@ impl<PixelType> Converter<PixelType> {
                 output_constraints,
                 cpixel_dimensions,
             ),
-            maximize_contrast: self.maximize_contrast
+            maximize_contrast: self.maximize_contrast,
         }
     }
 
@@ -83,15 +91,38 @@ impl<PixelType> Converter<PixelType> {
         };
         Dimensions::fit_with_locked_ratio(image_dimensions, &screen_in_pixels)
     }
-}
 
-impl<T: Into<u8> + Default + Copy + Sum + PartialOrd + From<u8>>
-Converter<T> {
-    pub fn convert_one(&mut self, image: &ImageBuffer<T>) -> ImageBuffer<Cpixel> {
-        self.converter.convert_one(
-            &image.resize(&self.output_dimensions),
-            &self.cpixel_dimensions,
-        )
+    #[allow(dead_code)]
+    pub fn convert_one<T: ToBrightness + Clone + Default>(
+        &mut self,
+        image: &ImageBuffer<T>,
+    ) -> ImageBuffer<Cpixel> {
+        let mut brightness_image = ImageBuffer::new(
+            image.dimensions,
+            image.buffer.iter().map(|x| x.to_brightness()).collect())
+            .resize(&self.output_dimensions);
+        self.maybe_maximize_contrast(&mut brightness_image.buffer);
+        self.converter.convert(&brightness_image, &self.cpixel_dimensions)
+    }
+
+    fn maximize_contrast<'a>(
+        pixels: impl Iterator<Item=&'a mut u8>, min: u8, max: u8,
+    ) {
+        let max_mult = u8::MAX / max;
+        pixels.for_each(|x| {
+            *x -= min;
+            *x *= max_mult;
+        })
+    }
+    fn maybe_maximize_contrast(&self, buffer: &mut Vec<u8>) {
+        if self.maximize_contrast {
+            let pixels = buffer.iter();
+            if let MinMaxResult::MinMax(&min, &max) = pixels.minmax() {
+                Self::maximize_contrast(
+                    buffer.iter_mut(), min, max,
+                )
+            }
+        }
     }
 }
 
@@ -107,7 +138,7 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let output_constraints = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        Converter::<u8>::new(
+        Converter::new(
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
@@ -120,7 +151,7 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let output_constraints = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        let mut converter = Converter::<u8>::new(
+        let mut converter = Converter::new(
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,
@@ -136,7 +167,7 @@ mod tests {
         let input_image_dimensions = Dimensions { height: 1, width: 1 };
         let output_constraints = Dimensions { height: 1, width: 1 };
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
-        let mut converter: Converter<u8> = Converter::new(
+        let mut converter: Converter = Converter::new(
             &output_constraints,
             &input_image_dimensions,
             &cpixel_dimensions,

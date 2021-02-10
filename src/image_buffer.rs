@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::dimensions::{Dim, Dimensions};
 use crate::yuv::Yuv420;
-use crate::pixel::{Brightness, Pixel};
+use crate::pixel::{Pixel};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ImageBuffer<T> {

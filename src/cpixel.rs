@@ -1,7 +1,7 @@
 use crate::image_buffer::ImageBuffer;
 use crate::dimensions::Dimensions;
-use itertools::Itertools;
-use std::iter::Sum;
+use itertools::{Itertools, IntoChunks};
+use std::iter::{Iterator};
 use std::fmt::{Display, Formatter};
 use std::fmt;
 
@@ -36,11 +36,11 @@ impl Display for Cpixel {
     }
 }
 
-pub struct CpixelConverter<T> {
-    buf: Vec<T>,
+pub struct CpixelConverter {
+    buf: Vec<u8>,
 }
 
-impl<T> CpixelConverter<T> {
+impl CpixelConverter {
     #[allow(dead_code)]
     pub fn capacity(&self) -> usize {
         self.buf.capacity()
@@ -54,63 +54,87 @@ impl<T> CpixelConverter<T> {
     }
 }
 
-impl<T> Default for CpixelConverter<T> {
-    fn default() -> Self {
-        CpixelConverter { buf: vec![] }
+impl CpixelConverter {
+    pub fn resize_buf(&mut self, new_len: usize) {
+        self.buf.resize_with(new_len, u8::default);
     }
-}
 
-impl<T: Default> CpixelConverter<T> {
-    pub fn resize(&mut self, new_len: usize) {
-        self.buf.resize_with(new_len, T::default);
-    }
-}
-
-impl<T: Into<u8> + Default + Sum + Copy + PartialOrd + From<u8>> CpixelConverter<T> {
-    pub fn convert_one(
+    pub fn convert(
         &mut self,
-        image: &ImageBuffer<T>,
+        image: &ImageBuffer<u8>,
         cpixel_dimensions: &Dimensions,
     ) -> ImageBuffer<Cpixel> {
         assert_eq!(image.dimensions.width % cpixel_dimensions.width, 0);
         assert_eq!(image.dimensions.height % cpixel_dimensions.height, 0);
 
-        let new_dimensions = Dimensions {
-            height: image.dimensions.height / cpixel_dimensions.height,
-            width: image.dimensions.width / cpixel_dimensions.width,
-        };
-
+        let new_dimensions = Self::generate_new_dimensions(
+            &image.dimensions, cpixel_dimensions,
+        );
         // Resize the converter buffer, filling with default as necessary.
-        self.resize(new_dimensions.total());
+        self.resize_buf(new_dimensions.total());
 
-        let row_groups = image.buffer
-            // Chunks of row_data.
-            .chunks_exact(image.dimensions.width)
-            // Chunks of rows of cpixel data.
-            .map(|x| x.chunks_exact(cpixel_dimensions.width))
-            // Chunks of cpixel rows.
-            .chunks(cpixel_dimensions.height);
+        let pixel_groups = self.partition_cpixels(image, cpixel_dimensions);
+        self.store_cpixel_brightness_sum(pixel_groups, &new_dimensions);
+        let new_buf =  self.collect_from_buf(cpixel_dimensions);
+        ImageBuffer::new(new_dimensions, new_buf)
+    }
 
-        let mut buf_slice: &mut [T];
+    fn generate_new_dimensions(
+        image_dimensions: &Dimensions,
+        cpixel_dimensions: &Dimensions,
+    ) -> Dimensions {
+        Dimensions {
+            height: image_dimensions.height / cpixel_dimensions.height,
+            width: image_dimensions.width / cpixel_dimensions.width,
+        }
+    }
 
+    fn store_cpixel_brightness_sum<'a>(
+        &mut self,
+        row_groups: IntoChunks<impl Iterator<Item=impl Iterator<Item=&'a [u8]> + 'a> + 'a>,
+        new_dimensions: &Dimensions,
+    ) {
         for (i, row_group) in row_groups.into_iter().enumerate() {
             let index = i * new_dimensions.width;
-            buf_slice = &mut self.buf[index..];
+            let buf_slice = &mut self.buf[index..];
             for row in row_group {
                 for (a, b) in buf_slice.iter_mut().zip(row) {
                     *a = b.iter().copied().sum();
                 }
             }
         }
+    }
 
-        let new_buf = self.buf.iter()
+    fn collect_from_buf(&self, cpixel_dimensions: &Dimensions) -> Vec<Cpixel> {
+        let pixels_in_cpixel = cpixel_dimensions.total();
+        self.buf.iter()
             .map(|x| {
-                debug_assert!(*x <= T::from(u8::MAX));
-                let brightness = (*x).into() / cpixel_dimensions.total() as u8;
-                Cpixel::from_brightness(brightness)
-            });
+                let average = *x / pixels_in_cpixel as u8;
+                Cpixel::from_brightness(average)
+            })
+            .collect()
+    }
 
-        ImageBuffer::new(new_dimensions, new_buf.collect())
+    fn partition_cpixels<'a, 'b>(
+        &self,
+        image: &'a ImageBuffer<u8>,
+        cpixel_dimensions: &'b Dimensions,
+    ) -> IntoChunks<impl Iterator<Item=impl Iterator<Item=&'a [u8]> + 'a> + 'a> {
+        let width = cpixel_dimensions.width;
+        let height = cpixel_dimensions.height;
+        image.buffer
+            // Chunks of row_data.
+            .chunks_exact(image.dimensions.width)
+            // Chunks of rows of cpixel data.
+            .map(move |x| x.chunks_exact(width))
+            // Chunks of cpixel rows.
+            .chunks(height)
+    }
+}
+
+impl Default for CpixelConverter {
+    fn default() -> Self {
+        CpixelConverter { buf: vec![] }
     }
 }
 
@@ -126,7 +150,7 @@ mod tests {
         let cpixel_dimensions = Dimensions { height: 1, width: 1 };
         let image = ImageBuffer::new(Dimensions { height: 2, width: 4 },
                                      vec![0, 0, 0, 0, 0, 0, 0, 0]);
-        let cpixel_image = converter.convert_one(&image, &cpixel_dimensions);
+        let cpixel_image = converter.convert(&image, &cpixel_dimensions);
         assert_eq!(
             cpixel_image,
             ImageBuffer { buffer: vec![Cpixel(' '); 8], dimensions: image.dimensions }

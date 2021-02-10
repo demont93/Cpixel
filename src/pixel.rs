@@ -1,13 +1,24 @@
-pub trait Pixel {
+
+pub trait ToBrightness {
+    fn to_brightness(&self) -> u8;
+}
+
+pub trait Pixel: ToBrightness {
     type DesaturatedPixel: Brightness;
     fn desaturate(&self) -> Self::DesaturatedPixel;
 }
 
-pub trait Brightness {
+pub trait Brightness: ToBrightness {
     fn min() -> Self;
     fn max() -> Self;
     fn average(&self, rhs: &Self) -> Self;
     fn to_byte(&self) -> u8;
+}
+
+impl ToBrightness for u8 {
+    fn to_brightness(&self) -> u8 {
+        self.to_byte()
+    }
 }
 
 impl Brightness for u8 {
