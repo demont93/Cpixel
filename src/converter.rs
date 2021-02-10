@@ -108,10 +108,10 @@ impl Converter {
     fn maximize_contrast<'a>(
         pixels: impl Iterator<Item=&'a mut u8>, min: u8, max: u8,
     ) {
-        let max_mult = u8::MAX / (max - min);
+        let max_mult = u8::MAX as f64 / (max - min) as f64;
         pixels.for_each(|x| {
             *x -= min;
-            *x *= max_mult;
+            *x = (*x as f64 * max_mult).round() as u8;
         })
     }
     fn maybe_maximize_contrast(&self, buffer: &mut Vec<u8>) {
