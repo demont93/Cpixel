@@ -8,9 +8,10 @@ edition = "2018"
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
+path = "src/android_lib.rs"
 
 [dependencies]
-cpixels = { git = "https://github.com/demont93/cpixels.git" , branch = "main"}
+cpixels = { git = "https://github.com/demont93/cpixels", branch = "main"}
 
 [target.'cfg(target_os = "android")'.dependencies]
 jni = { version = "0.18.0", default-features = false }
