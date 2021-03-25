@@ -2,10 +2,12 @@ pub trait ToBrightness {
     fn to_brightness(&self) -> u8;
 }
 
+
 pub trait Pixel: ToBrightness {
     type DesaturatedPixel: Brightness;
     fn desaturate(&self) -> Self::DesaturatedPixel;
 }
+
 
 struct RGB {
     red: u8,
@@ -13,12 +15,14 @@ struct RGB {
     blue: u8,
 }
 
+
 impl ToBrightness for RGB {
     fn to_brightness(&self) -> u8 {
         let sum = self.red as u16 + self.green as u16 + self.blue as u16;
         (sum as f64 / 3.0).round() as u8
     }
 }
+
 
 impl Pixel for RGB {
     type DesaturatedPixel = u8;
@@ -28,6 +32,7 @@ impl Pixel for RGB {
     }
 }
 
+
 pub trait Brightness: ToBrightness {
     fn min() -> Self;
     fn max() -> Self;
@@ -35,11 +40,13 @@ pub trait Brightness: ToBrightness {
     fn to_byte(&self) -> u8;
 }
 
+
 impl ToBrightness for u8 {
     fn to_brightness(&self) -> u8 {
         self.to_byte()
     }
 }
+
 
 impl Brightness for u8 {
     fn min() -> Self {
