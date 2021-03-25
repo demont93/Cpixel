@@ -1,13 +1,11 @@
 [package]
-name = "cpixels_android_lib"
+name = "cpixel"
 version = "0.1.0"
 authors = ["demont93 <demont93@gmail.com>"]
 edition = "2018"
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
-name = "cpixels_android_lib"
-path = "src/lib.rs"
 
 [dependencies]
 cpixels = { git = "https://github.com/demont93/cpixels", branch = "main"}
