@@ -1,6 +1,7 @@
-use crate::{ImageBuffer, Cpixel, Dimensions};
-use crate::cpixel::CpixelConverter;
+use crate::cpixel::{CpixelConverter, Cpixel};
 use crate::pixel::{ToBrightness};
+use crate::Dimensions;
+use crate::image_buffer::ImageBuffer;
 use itertools::{MinMaxResult, Itertools};
 
 pub struct Converter {

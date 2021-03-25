@@ -1,18 +1,18 @@
 [package]
-name = "cpixels-android-lib"
+name = "cpixels_android_lib"
 version = "0.1.0"
 authors = ["demont93 <demont93@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
 crate-type = ["staticlib", "cdylib"]
-path = "src/android_lib.rs"
+name = "cpixels_android_lib"
+path = "src/lib.rs"
 
 [dependencies]
 cpixels = { git = "https://github.com/demont93/cpixels", branch = "main"}
+itertools = "0.10.0"
 
 [target.'cfg(target_os = "android")'.dependencies]
-jni = { version = "0.18.0", default-features = false }
+jni = { version = "0.19.0", default-features = false }
 ndk = "0.3.0"

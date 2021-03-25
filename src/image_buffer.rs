@@ -133,6 +133,7 @@ impl<T: Clone + Default> ImageBuffer<T> {
     }
 }
 
+#[allow(dead_code)]
 impl<T: Pixel> ImageBuffer<T> {
     pub fn desaturate(&self) -> ImageBuffer<T::DesaturatedPixel> {
         ImageBuffer {
