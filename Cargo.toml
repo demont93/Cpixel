@@ -8,7 +8,6 @@ edition = "2018"
 crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
-cpixels = { git = "https://github.com/demont93/cpixels", branch = "main"}
 itertools = "0.10.0"
 
 [target.'cfg(target_os = "android")'.dependencies]

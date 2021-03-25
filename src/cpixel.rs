@@ -133,7 +133,7 @@ impl CpixelConverter {
     }
 
     fn reset_buf(&mut self) {
-        self.buf.fill(0)
+        self.buf.iter_mut().for_each(|x| *x = 0);
     }
 }
 
