@@ -1,67 +1,66 @@
-pub trait ToBrightness {
-    fn to_brightness(&self) -> u8;
+use std::ops::{Deref, DerefMut};
+
+pub trait Pixel {
+    fn into_desaturated(self) -> Brightness;
 }
 
-
-pub trait Pixel: ToBrightness {
-    type DesaturatedPixel: Brightness;
-    fn desaturate(&self) -> Self::DesaturatedPixel;
-}
-
-
-struct RGB {
+pub struct RGB {
     red: u8,
     green: u8,
     blue: u8,
 }
 
-
-impl ToBrightness for RGB {
-    fn to_brightness(&self) -> u8 {
-        let sum = self.red as u16 + self.green as u16 + self.blue as u16;
-        (sum as f64 / 3.0).round() as u8
-    }
-}
-
-
 impl Pixel for RGB {
-    type DesaturatedPixel = u8;
+    fn into_desaturated(self) -> Brightness {
+        (((self.red as u16 + self.green as u16 + self.blue as u16) / 3) as u8)
+            .into()
+    }
+}
 
-    fn desaturate(&self) -> Self::DesaturatedPixel {
-        self.to_brightness()
+impl Pixel for Brightness {
+    fn into_desaturated(self) -> Brightness {
+        self
     }
 }
 
 
-pub trait Brightness: ToBrightness {
-    fn min() -> Self;
-    fn max() -> Self;
-    fn average(&self, rhs: &Self) -> Self;
-    fn to_byte(&self) -> u8;
-}
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+pub struct Brightness(u8);
 
-
-impl ToBrightness for u8 {
-    fn to_brightness(&self) -> u8 {
-        self.to_byte()
-    }
-}
-
-
-impl Brightness for u8 {
+impl Brightness {
     fn min() -> Self {
-        u8::MIN
+        u8::MIN.into()
     }
 
     fn max() -> Self {
-        u8::MAX
+        u8::MAX.into()
     }
 
     fn average(&self, rhs: &Self) -> Self {
-        (*self as u16 + *rhs as u16 / 2) as u8
+        ((*self.deref() as u16 + *rhs.deref() as u16 / 2) as u8).into()
     }
 
     fn to_byte(&self) -> u8 {
-        *self
+        *self.deref()
+    }
+}
+
+impl Deref for Brightness {
+    type Target = u8;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Brightness {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl From<u8> for Brightness {
+    fn from(byte: u8) -> Self {
+        Brightness(byte)
     }
 }
