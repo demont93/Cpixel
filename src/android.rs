@@ -6,8 +6,6 @@ use crate::converter::Converter;
 use crate::dimensions::Dimensions;
 use crate::buffer_2d::Buffer2d;
 
-mod android_lib;
-
 #[no_mangle]
 pub unsafe extern
 fn Java_com_demont93_camera_1x_1app_RustBindings_newConverter(
@@ -19,8 +17,7 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_newConverter(
     input_width: jint,
     cpixel_height: jint,
     cpixel_width: jint,
-) -> jlong
-{
+) -> jlong {
     Box::into_raw(Box::new(Converter::new(
         &Dimensions {
             height: output_height as usize,
@@ -41,8 +38,7 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_convert(
     _: JClass,
     converter_i64: jlong,
     buffer: jbyteArray,
-) -> jstring
-{
+) -> jstring {
     let converter = converter_i64 as *mut Converter;
     let dims = (*converter).image_settings();
     let buffer = env.convert_byte_array(buffer).unwrap();
