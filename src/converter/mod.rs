@@ -3,7 +3,6 @@ use crate::buffer_2d::Buffer2d;
 use scale::Scale;
 use itertools::{MinMaxResult, Itertools};
 use cpixel::Cpixel;
-use std::cmp::{Ord, Ordering};
 
 mod scale;
 pub mod cpixel;
@@ -14,6 +13,7 @@ pub struct Converter {
     input_image_dimensions: Dimensions,
     output_dimensions: Dimensions,
     maximize_contrast: bool,
+    #[allow(dead_code)]
     cpixel_size_ratio: f64,
 }
 
@@ -92,6 +92,7 @@ impl Converter {
         Dimensions::fit_with_locked_ratio(image_dimensions, &screen)
     }
 
+    #[allow(dead_code)]
     fn maximize_contrast<'a>(
         pixels: impl Iterator<Item=&'a mut u8>,
         min: u8,
@@ -104,6 +105,7 @@ impl Converter {
         })
     }
 
+    #[allow(dead_code)]
     fn maybe_maximize_contrast(&self, buffer: &mut Vec<u8>) {
         if self.maximize_contrast {
             let pixels = buffer.iter();
