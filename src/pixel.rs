@@ -28,18 +28,22 @@ impl Pixel for Brightness {
 pub struct Brightness(u8);
 
 impl Brightness {
+    #[allow(dead_code)]
     fn min() -> Self {
         u8::MIN.into()
     }
 
+    #[allow(dead_code)]
     fn max() -> Self {
         u8::MAX.into()
     }
 
+    #[allow(dead_code)]
     fn average(&self, rhs: &Self) -> Self {
         ((*self.deref() as u16 + *rhs.deref() as u16 / 2) as u8).into()
     }
 
+    #[allow(dead_code)]
     fn to_byte(&self) -> u8 {
         *self.deref()
     }
