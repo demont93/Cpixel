@@ -5,7 +5,7 @@ use itertools::{MinMaxResult, Itertools};
 use cpixel::Cpixel;
 
 mod scale;
-mod cpixel;
+pub mod cpixel;
 
 pub struct Converter {
     scale: Scale,
