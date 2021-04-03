@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::iter::{Iterator};
 use std::fmt::{Display, Formatter};
 use std::fmt;

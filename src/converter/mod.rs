@@ -3,6 +3,7 @@ use crate::buffer_2d::Buffer2d;
 use scale::Scale;
 use itertools::{MinMaxResult, Itertools};
 use cpixel::Cpixel;
+use std::cmp::{Ord, Ordering};
 
 mod scale;
 pub mod cpixel;
@@ -13,6 +14,7 @@ pub struct Converter {
     input_image_dimensions: Dimensions,
     output_dimensions: Dimensions,
     maximize_contrast: bool,
+    cpixel_size_ratio: f64,
 }
 
 impl Converter {
@@ -39,8 +41,12 @@ impl Converter {
         input_image_dimensions: &Dimensions,
         maximize_contrast: bool,
     ) -> Self {
+        let cpixel_size_ratio: f64 = 2.0;
         let output_dimensions = Self::generate_output_dimensions(
-            input_image_dimensions,
+            &Dimensions {
+                width: (input_image_dimensions.width as f64 * cpixel_size_ratio) as usize,
+                ..*input_image_dimensions
+            },
             output_constraints,
         );
         Self {
@@ -49,6 +55,7 @@ impl Converter {
             input_image_dimensions: *input_image_dimensions,
             output_dimensions,
             maximize_contrast,
+            cpixel_size_ratio,
         }
     }
 }
