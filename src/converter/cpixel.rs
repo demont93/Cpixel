@@ -23,15 +23,14 @@ impl Cpixel {
             230_u8, 236_u8, 243_u8, 249_u8, 253_u8
         ];
         lazy_static::lazy_static! {
-            static ref MAP: HashMap<u8, char> = {
-                let mut map = HashMap::new();
-                BRIGHTNESS.iter().zip(CHARS.iter()).for_each(|(&b,&c)| {
-                    map.insert(b,c);
-                });
-                map
-            };
+            static ref MAP: Vec<(&'static u8, &'static char)> =
+                BRIGHTNESS.iter().zip(CHARS.iter()).collect();
         }
-        Cpixel(*MAP.get(&brightness).unwrap())
+        let index = match &(*MAP).binary_search_by_key(&brightness, |(&b, _)| b) {
+            Ok(index) => *index,
+            Err(index) => index - 1_usize,
+        };
+        Cpixel(CHARS[index])
     }
 }
 
