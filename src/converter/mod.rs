@@ -27,7 +27,6 @@ impl Converter {
         &mut self,
         image: &Buffer2d<T>,
     ) -> Buffer2d<Cpixel> {
-        println!("scale dimensions: {:?}, input_image_dimensions: {:?}", self.scale.get_from_dimensions(), self.input_image_dimensions);
         let mut image = Cow::Borrowed(image);
         if let ResizeType::Fill = self.resize_type {
             let width_to_crop = self.input_image_dimensions.width - self.scale.get_from_dimensions().width;

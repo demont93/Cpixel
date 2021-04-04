@@ -102,7 +102,6 @@ impl Scale {
             self.from_dimensions,
             "Scale and buffer have different dimensions"
         );
-        println!("{:?}", self);
         let mut buffer: &Buffer2d<usize> = &Buffer2d {
             buffer: buf.buffer.iter().map(|x| x.clone().into().into()).collect(),
             dimensions: buf.dimensions,
