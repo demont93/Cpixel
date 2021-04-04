@@ -2,7 +2,7 @@ use jni::JNIEnv;
 use jni::objects::{JClass};
 use jni::sys::{jstring, jlong, jbyteArray, jint};
 
-use crate::converter::Converter;
+use crate::converter::{Converter, ResizeType};
 use crate::dimensions::Dimensions;
 use crate::buffer_2d::Buffer2d;
 
@@ -17,15 +17,16 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_newConverter(
     input_width: jint,
 ) -> jlong {
     Box::into_raw(Box::new(Converter::new(
-        &Dimensions {
+        Dimensions {
             height: output_height as usize,
             width: output_width as usize,
         },
-        &Dimensions {
+        Dimensions {
             height: input_height as usize,
             width: input_width as usize,
         },
         true,
+        ResizeType::Fill,
     ))) as i64
 }
 

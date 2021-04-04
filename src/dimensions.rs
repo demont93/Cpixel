@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use crate::util::Point;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct Dimensions {
@@ -50,6 +51,10 @@ impl Dimensions {
         self.height as f64 / self.width as f64
     }
 
+    pub fn ratio_width(&self) -> f64 {
+        self.width as f64 / self.height as f64
+    }
+
     pub fn total(&self) -> usize {
         self.height * self.width
     }
@@ -89,6 +94,15 @@ impl PartialOrd for Dimensions {
                 None
             }
         }))
+    }
+}
+
+impl<T: Into<usize>> From<Point<T>> for Dimensions {
+    fn from(point: Point<T>) -> Self {
+        Self {
+            height: point.y.into(),
+            width: point.x.into(),
+        }
     }
 }
 
