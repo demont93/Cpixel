@@ -23,7 +23,8 @@ impl Converter {
         &mut self,
         image: &Buffer2d<T>,
     ) -> Buffer2d<Cpixel> {
-        let buffer = self.scale.resize(image);
+        let mut buffer = self.scale.resize(image);
+        self.maybe_maximize_contrast(&mut buffer.buffer);
         Buffer2d {
             buffer: buffer.buffer
                 .iter()

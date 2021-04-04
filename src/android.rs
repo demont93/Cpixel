@@ -15,8 +15,6 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_newConverter(
     output_width: jint,
     input_height: jint,
     input_width: jint,
-    cpixel_height: jint,
-    cpixel_width: jint,
 ) -> jlong {
     Box::into_raw(Box::new(Converter::new(
         &Dimensions {
@@ -66,5 +64,5 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_dropConverter(
     _: JClass,
     converter_i64: jlong,
 ) {
-    let converter = Box::from_raw(converter_i64 as *mut Converter);
+    Box::from_raw(converter_i64 as *mut Converter);
 }
