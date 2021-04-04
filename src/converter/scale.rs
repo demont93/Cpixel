@@ -1,6 +1,7 @@
 use crate::{Dimensions, Buffer2d};
 use std::cmp::Ordering;
 use std::convert::TryInto;
+use std::fmt::{Debug, Formatter};
 
 pub struct Scale {
     grow_buffer: Buffer2d<usize>,
@@ -101,6 +102,7 @@ impl Scale {
             self.from_dimensions,
             "Scale and buffer have different dimensions"
         );
+        println!("{:?}", self);
         let mut buffer: &Buffer2d<usize> = &Buffer2d {
             buffer: buf.buffer.iter().map(|x| x.clone().into().into()).collect(),
             dimensions: buf.dimensions,
@@ -198,6 +200,19 @@ impl Scale {
     fn calc_grow_stride(initial_n: usize, final_n: usize) -> f64 {
         let delta = final_n - initial_n;
         final_n as f64 / delta as f64
+    }
+}
+
+impl Debug for Scale {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Scale{{ from_dimensions: {:?}, to_dimensions: {:?}, needs_grow: {:?}, needs_shrink: {:?} }}",
+            self.from_dimensions,
+            self.to_dimensions,
+            self.needs_grow,
+            self.needs_shrink
+        )
     }
 }
 
