@@ -96,6 +96,11 @@ impl Scale {
         buf: &Buffer2d<T>,
     ) -> Buffer2d<u8>
     {
+        assert_eq!(
+            buf.dimensions,
+            self.from_dimensions,
+            "Scale and buffer have different dimensions"
+        );
         let mut buffer: &Buffer2d<usize> = &Buffer2d {
             buffer: buf.buffer.iter().map(|x| x.clone().into().into()).collect(),
             dimensions: buf.dimensions,

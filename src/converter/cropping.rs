@@ -103,10 +103,10 @@ mod tests {
             dimensions: Dimensions { height: 5, width: 1 },
             buffer: vec![255, 134, 89, 98, 2],
         };
-        let half_width_buffer = crop_centered(&buffer, 0, 2);
+        let half_width_buffer = crop_centered(&buffer, 0, 3);
         assert_eq!(half_width_buffer, Buffer2d::new(
-            Dimensions { height: 3, width: 1 },
-            vec![134, 89, 98],
+            Dimensions { height: 2, width: 1 },
+            vec![134, 89],
         ));
     }
 }
