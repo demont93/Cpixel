@@ -150,14 +150,14 @@ impl Converter {
                 // Resize width.
                 Dimensions {
                     height: input_dimensions.height,
-                    width: (input_dimensions.width as f64 /
+                    width: (input_dimensions.height as f64 /
                         output_constraints_ratio) as usize,
                 }
             }
             Less => {
                 // Resize heigth.
                 Dimensions {
-                    height: (input_dimensions.height as f64 *
+                    height: (input_dimensions.width as f64 *
                         output_constraints_ratio) as usize,
                     width: input_dimensions.width,
                 }
