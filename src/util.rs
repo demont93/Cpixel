@@ -1,5 +1,5 @@
 use crate::Dimensions;
-use std::ops::Sub;
+use std::ops::{Sub, Add};
 
 #[derive(Copy, Clone)]
 pub struct Point<T> {
@@ -40,5 +40,13 @@ impl<T: Sub<Output = T>> Sub for Point<T> {
             y: self.y - rhs.y,
             x: self.x - rhs.x,
         }
+    }
+}
+
+impl<T: Add<Output = T>> Add for Point<T> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Point{ y: self.y + rhs.y, x: self.x + rhs.x }
     }
 }
