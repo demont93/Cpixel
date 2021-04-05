@@ -57,13 +57,15 @@ impl Converter {
         let scaler_input_dimensions = Self::generate_scaler_dimensions(
             &input_image_dimensions,
             &output_constraints,
+            cpixel_size_ratio,
             &resize_type,
         );
+        let input_image_dimensions_in_cpixel = Dimensions {
+            width: (input_image_dimensions.width as f64 * cpixel_size_ratio) as usize,
+            ..input_image_dimensions
+        };
         let output_dimensions = Self::generate_output_dimensions(
-            &Dimensions {
-                width: (input_image_dimensions.width as f64 * cpixel_size_ratio) as usize,
-                ..input_image_dimensions
-            },
+            &input_image_dimensions_in_cpixel,
             &output_constraints,
             &resize_type,
         );
@@ -111,10 +113,19 @@ impl Converter {
     fn generate_scaler_dimensions(
         input_dimensions: &Dimensions,
         output_constraints: &Dimensions,
+        cpixel_ratio: f64,
         resize_type: &ResizeType,
     ) -> Dimensions {
         if let ResizeType::Fill = resize_type {
-            Self::fill_dimensions(input_dimensions, output_constraints)
+            let input_image_dimensions_in_cpixel = Dimensions {
+                width: (input_dimensions.width as f64 * cpixel_ratio) as usize,
+                ..*input_dimensions
+            };
+            let input_dimensions = Self::input_dimensions_matching_output_image_ratio(input_dimensions, output_constraints);
+            Dimensions {
+                width: (input_dimensions.width as f64 / cpixel_ratio) as usize,
+                ..input_dimensions
+            }
         } else {
             *input_dimensions
         }
@@ -133,7 +144,7 @@ impl Converter {
         }
     }
 
-    fn fill_dimensions(
+    fn input_dimensions_matching_output_image_ratio(
         input_dimensions: &Dimensions,
         output_constraints: &Dimensions,
     ) -> Dimensions {
