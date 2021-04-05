@@ -2,7 +2,7 @@ use jni::JNIEnv;
 use jni::objects::{JClass};
 use jni::sys::{jstring, jlong, jbyteArray, jint};
 
-use crate::converter::{Converter, ResizeType};
+use crate::converter::{Converter};
 use crate::dimensions::Dimensions;
 use crate::buffer_2d::Buffer2d;
 
@@ -15,6 +15,7 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_newConverter(
     output_width: jint,
     input_height: jint,
     input_width: jint,
+    resize_type: jint,
 ) -> jlong {
     Box::into_raw(Box::new(Converter::new(
         Dimensions {
@@ -26,7 +27,7 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_newConverter(
             width: input_width as usize,
         },
         true,
-        ResizeType::Fill,
+        resize_type.into(),
     ))) as i64
 }
 
@@ -66,4 +67,32 @@ fn Java_com_demont93_camera_1x_1app_RustBindings_dropConverter(
     converter_i64: jlong,
 ) {
     Box::from_raw(converter_i64 as *mut Converter);
+}
+
+#[no_mangle]
+pub unsafe extern
+fn Java_com_demont93_camera_1x_1app_RustBindings_getOutputWidth(
+    _: JNIEnv,
+    _: JClass,
+    converter_i64: jlong,
+) -> jint {
+    let converter = Box::from_raw(converter_i64 as *mut Converter);
+    let output_dimensions = converter.output_dimensions();
+    let width = output_dimensions.width as i32;
+    Box::into_raw(converter);
+    width
+}
+
+#[no_mangle]
+pub unsafe extern
+fn Java_com_demont93_camera_1x_1app_RustBindings_getOutputHeight(
+    _: JNIEnv,
+    _: JClass,
+    converter_i64: jlong,
+) -> jint {
+    let converter = Box::from_raw(converter_i64 as *mut Converter);
+    let output_dimensions = converter.output_dimensions();
+    let height = output_dimensions.height as i32;
+    Box::into_raw(converter);
+    height
 }

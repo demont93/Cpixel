@@ -207,3 +207,15 @@ pub enum ResizeType {
     Fill,
     Stretch,
 }
+
+impl From<i32> for ResizeType {
+    fn from(n: i32) -> Self {
+        use ResizeType::*;
+        match n {
+            0 => Fit,
+            1 => Fill,
+            2 => Stretch,
+            _ => panic!("Invalid int to convert to ResizeType enum")
+        }
+    }
+}
