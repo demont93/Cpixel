@@ -117,10 +117,6 @@ impl Converter {
         resize_type: &ResizeType,
     ) -> Dimensions {
         if let ResizeType::Fill = resize_type {
-            let input_image_dimensions_in_cpixel = Dimensions {
-                width: (input_dimensions.width as f64 * cpixel_ratio) as usize,
-                ..*input_dimensions
-            };
             let input_dimensions = Self::input_dimensions_matching_output_image_ratio(input_dimensions, output_constraints);
             Dimensions {
                 width: (input_dimensions.width as f64 / cpixel_ratio) as usize,
